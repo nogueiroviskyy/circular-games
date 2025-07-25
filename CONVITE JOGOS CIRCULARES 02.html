@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seletor de Equipe Circular</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
+        
+        :root {
+            --gryffindor-red: #7C2D12;
+            --gryffindor-gold: #D97706;
+            --slytherin-green: #166534;
+            --slytherin-silver: #64748B;
+            --ravenclaw-blue: #1E40AF;
+            --ravenclaw-bronze: #A16207;
+            --hufflepuff-yellow: #FACC15;
+            --hufflepuff-black: #1F2937;
+        }
+
+        .font-magical { font-family: 'Cinzel', serif; }
+        .font-story { font-family: 'EB Garamond', serif; }
+        
+        .magical-bg {
+            background: #000000;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .stars {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .star {
+            width: 2px;
+            height: 2px;
+            background: white;
+            position: absolute;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .castle-silhouette {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(to top, #000 0%, transparent 100%);
+            clip-path: polygon(
+                0% 100%, 5% 85%, 10% 90%, 15% 75%, 20% 80%, 25% 65%, 30% 70%, 
+                35% 55%, 40% 60%, 45% 45%, 50% 50%, 55% 40%, 60% 45%, 65% 35%, 
+                70% 40%, 75% 30%, 80% 35%, 85% 25%, 90% 30%, 95% 20%, 100% 25%, 100% 100%
+            );
+        }
+
+        .floating-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #fbbf24;
+            border-radius: 50%;
+            animation: float 6s infinite linear;
+            opacity: 0.7;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            90% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .hat-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .sorting-hat {
+            width: 120px;
+            height: 120px;
+            background: transparent;
+            border-radius: 50%;
+            position: relative;
+            margin: 0 auto;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .hat-fold {
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            width: 80px;
+            height: 60px;
+            background: #654321;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            transform: rotate(-15deg);
+        }
+
+        .hat-eyes {
+            position: absolute;
+            top: 40px;
+            left: 30px;
+            width: 8px;
+            height: 8px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 20px 0 0 #fff;
+            animation: blink 4s infinite;
+        }
+
+        .hat-pupils {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 4px;
+            height: 4px;
+            background: #000;
+            border-radius: 50%;
+            box-shadow: 20px 0 0 #000;
+            transition: all 0.3s ease;
+        }
+
+        .hat-mouth {
+            position: absolute;
+            top: 55px;
+            left: 40px;
+            width: 30px;
+            height: 15px;
+            border: 2px solid #000;
+            border-top: none;
+            border-radius: 0 0 15px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .hat-thinking .hat-eyes {
+            animation: thinking-blink 0.5s infinite;
+        }
+
+        .hat-happy .hat-mouth {
+            border-radius: 0 0 30px 30px;
+            height: 20px;
+            background: #ff69b4;
+        }
+
+        @keyframes thinking-blink {
+            0%, 90% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+
+        @keyframes blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+
+        .quill-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quill-effect::after {
+            content: '✒️';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .quill-effect:focus::after {
+            opacity: 1;
+            animation: write 0.5s ease;
+        }
+
+        @keyframes write {
+            0% { transform: translateY(-50%) rotate(-10deg); }
+            50% { transform: translateY(-50%) rotate(5deg); }
+            100% { transform: translateY(-50%) rotate(0deg); }
+        }
+
+        .house-reveal {
+            animation: houseReveal 2s ease-out;
+        }
+
+        @keyframes houseReveal {
+            0% {
+                opacity: 0;
+                transform: scale(0.5) rotateY(180deg);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.1) rotateY(90deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotateY(0deg);
+            }
+        }
+
+        .crest {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            position: relative;
+            overflow: hidden;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .crest::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .gryffindor { background: linear-gradient(135deg, var(--gryffindor-red), var(--gryffindor-gold)); }
+        .slytherin { background: linear-gradient(135deg, var(--slytherin-green), var(--slytherin-silver)); }
+        .ravenclaw { background: linear-gradient(135deg, var(--ravenclaw-blue), var(--ravenclaw-bronze)); }
+        .hufflepuff { background: linear-gradient(135deg, var(--hufflepuff-yellow), var(--hufflepuff-black)); }
+
+        .typewriter {
+            border-right: 2px solid #fbbf24;
+            white-space: nowrap;
+            overflow: hidden;
+            animation: typewriter 3s steps(50) 1s both, blink-cursor 1s step-end infinite;
+        }
+
+        @keyframes typewriter {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+
+        @keyframes blink-cursor {
+            50% { border-color: transparent; }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse-glow {
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(251, 191, 36, 0.8); }
+        }
+
+        .magical-button {
+            background: linear-gradient(135deg, #ffffff, #ff6b35, #8b4513, #7c3aed);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .magical-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .magical-button:hover::before {
+            left: 100%;
+        }
+
+        .magical-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+        }
+
+        @media (max-width: 640px) {
+            .sorting-hat { width: 80px; height: 80px; }
+            .hat-fold { width: 60px; height: 45px; top: -15px; left: 10px; }
+            .hat-eyes { top: 25px; left: 20px; }
+            .hat-mouth { top: 35px; left: 25px; width: 20px; }
+            .crest { width: 100px; height: 100px; font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body class="magical-bg font-story text-white">
+    <!-- Stars -->
+    <div class="stars" id="stars"></div>
+    
+    <!-- Floating Particles -->
+    <div class="floating-particles" id="particles"></div>
+    
+    <!-- Castle Silhouette -->
+    <div class="castle-silhouette"></div>
+
+    <!-- Main Container -->
+    <div class="relative z-10 min-h-screen p-4 py-20">
+        
+        <!-- Welcome Screen -->
+        <div id="welcomeScreen" class="text-center max-w-4xl mx-auto flex flex-col items-center justify-center min-h-screen">
+            <h1 class="font-magical text-4xl md:text-6xl lg:text-7xl mb-8 text-white font-black">
+                ✝️ Bem-vindo aos Jogos Circulares do EJC! ✝️
+            </h1>
+            
+            <div class="bg-black bg-opacity-50 rounded-lg p-6 md:p-8 mb-8 backdrop-blur-sm">
+                <p class="text-lg md:text-xl leading-relaxed mb-6 fade-in">
+                    Ei, você aí... sim, você mesmo! Chegou o momento de descobrir qual cor vai representar o seu espírito nessa jornada!
+                </p>
+                <p class="text-base md:text-lg leading-relaxed text-gray-300 fade-in" style="animation-delay: 1s;">
+                    Sou o <span class="text-yellow-300 font-semibold">Seletor dos Círculos</span> -- o guardião dos oito times lendários do EJC. Quatro deles já foram escolhidos:
+                    Amarelo 💛, Azul 💙, Vermelho ❤️ e Verde 💚.
+                </p>
+                <p class="text-base md:text-lg leading-relaxed text-gray-300 fade-in" style="animation-delay: 2s;">
+                    Agora, restam apenas quatro caminhos abertos…
+                    Roxo 💜, Laranja 🧡, Branco 🤍 ou Marrom 🤎.
+                    <br><br>
+                    Cada cor carrega uma missão única, um chamado especial.
+                </p>
+                <p class="text-base md:text-lg leading-relaxed text-gray-300 fade-in" style="animation-delay: 3s;">
+                    Respire fundo. Conecte-se com a energia do grupo.
+                    <br><br>
+                    Está pronto? Porque agora, vou revelar o círculo que te espera nos Jogos Circulares! 🏆🔥⚡
+                </p>
+            </div>
+            
+            <button onclick="startSorting()" class="magical-button text-white font-magical text-lg md:text-xl px-8 py-4 rounded-full pulse-glow">
+                ✨ INICIAR SELEÇÃO CIRCULAR! ✨
+            </button>
+        </div>
+
+        <!-- Sorting Screen -->
+        <div id="sortingScreen" class="hidden text-center max-w-2xl mx-auto flex flex-col items-center justify-center min-h-screen">
+            <!-- Sorting Hat -->
+            <div class="hat-container mb-8">
+                <div class="sorting-hat" id="sortingHat" onclick="performSorting()">
+                    <img src="https://pfst.cf2.poecdn.net/base/image/d6999c14d4dfc9a55f6c5c7ee320bb837babcbc28da857624cf073edab7081d7?w=872&h=879" alt="Logo EJC" class="w-full h-full object-contain rounded-full">
+                </div>
+            </div>
+
+            <!-- Name Input -->
+            <div class="mb-8">
+                <label class="block font-magical text-xl md:text-2xl mb-4 text-yellow-300">
+                    "Diga o seu nome completo, e você descobrirá."
+                </label>
+                <input 
+                    type="text" 
+                    id="nameInput" 
+                    placeholder="Digite seu nome aqui"
+                    class="quill-effect w-full max-w-md mx-auto px-6 py-4 text-lg text-center bg-black bg-opacity-50 border-2 border-yellow-500 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-yellow-300 focus:bg-opacity-70 transition-all"
+                    onkeypress="handleNameInput(event)"
+                />
+            </div>
+
+            <!-- Sorting Button -->
+            <button 
+                id="sortButton" 
+                onclick="performSorting()" 
+                disabled
+                class="magical-button disabled:opacity-50 disabled:cursor-not-allowed text-white font-magical font-bold text-lg md:text-xl px-8 py-4 rounded-full transition-all"
+            >
+                Quero descobrir o meu Círculo
+            </button>
+
+            <!-- Thinking Animation -->
+            <div id="thinkingText" class="hidden mt-6 text-lg text-yellow-300 font-magical">
+                <div class="typewriter">Hmm... interessante... muito interessante...</div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="resultScreen" class="hidden text-center max-w-3xl mx-auto">
+            <div class="house-reveal">
+                <!-- House Crest Image -->
+                <img id="houseCrestImage" src="" alt="Escudo do Círculo" class="w-32 h-32 md:w-40 md:h-40 mx-auto mb-6 object-contain">
+                
+                <!-- House Name -->
+                <h2 id="houseName" class="font-magical text-3xl md:text-5xl mb-6"></h2>
+                
+                <!-- Personal Message -->
+                <div class="bg-black bg-opacity-50 rounded-lg p-6 md:p-8 mb-6 backdrop-blur-sm">
+                    <p id="personalMessage" class="text-lg md:text-xl font-story leading-relaxed"></p>
+                </div>
+                
+                <!-- House Description -->
+                <div class="bg-black bg-opacity-30 rounded-lg p-6 md:p-8 mb-6 backdrop-blur-sm">
+                    <h3 class="font-magical text-xl md:text-2xl mb-4">Sobre seu Círculo:</h3>
+                    <p id="houseDescription" class="text-base md:text-lg leading-relaxed text-gray-300"></p>
+                </div>
+
+                <!-- House Reference -->
+                <div id="houseReference" class="bg-black bg-opacity-30 rounded-lg p-6 md:p-8 mb-6 backdrop-blur-sm">
+                    <p class="text-base md:text-lg leading-relaxed text-gray-300 whitespace-pre-line"></p>
+                </div>
+
+                <!-- House Symbols -->
+                <div id="houseSymbols" class="bg-black bg-opacity-30 rounded-lg p-6 md:p-8 mb-6 backdrop-blur-sm">
+                    <p class="text-base md:text-lg leading-relaxed text-gray-300 whitespace-pre-line"></p>
+                </div>
+
+                <!-- House Phrase -->
+                <div id="housePhrase" class="bg-black bg-opacity-30 rounded-lg p-6 md:p-8 mb-8 backdrop-blur-sm">
+                    <p class="text-base md:text-lg leading-relaxed text-yellow-300 font-semibold whitespace-pre-line"></p>
+                </div>
+
+                <!-- WhatsApp Group Button -->
+                <div class="flex justify-center">
+                    <a id="whatsappButton" href="#" target="_blank" class="inline-block text-white font-magical font-bold text-lg px-8 py-4 rounded-full transition-all transform hover:scale-105 hover:-translate-y-1 shadow-lg">
+                        📱 Entrar no Grupo do WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dark mode support
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // Houses data
+        const houses = {
+            gryffindor: {
+                name: "CÍRCULO LARANJA",
+                image: "https://pfst.cf2.poecdn.net/base/image/cbb7a234b2d8ad84c9aa216a19dc13ee460acc0e4ec563e86f99cfc4240c231e?w=1024&h=1024",
+                colors: "gryffindor",
+                traits: "brilho nos olhos, ousadia no coração e fé que pulsa como um clique eterno",
+                description: "Este é o Círculo da alegria missionária, da coragem digital e da fé viva no cotidiano. Aqui estão os que evangelizam com ousadia, sem medo de usar a internet, o jogo, o riso e até o erro para falar de Deus. Uma galera que vibra, conecta e testemunha com autenticidade.",
+                reference: "💻 Referência do Círculo:\nBeato Carlo Acutis -- jovem devoto da Eucaristia, criador de sites sobre milagres e evangelizador no mundo digital. Mostrou ao mundo que ser santo é para agora -- com jeans, tênis e Wi-Fi.",
+                phrase: "🧑‍💻 Frase que guia esse Círculo:\n\"A Eucaristia é a minha estrada para o céu.\"",
+                mascot: "Leão",
+                founder: "Carlo Acutis"
+            },
+            slytherin: {
+                name: "CÍRCULO MARROM",
+                image: "https://pfst.cf2.poecdn.net/base/image/6122bb5f464e82151db60cc3224b90aaf98772310d7e9dfc276c1ae7783335bf?w=1024&h=1024",
+                colors: "slytherin", 
+                traits: "alma livre, despojada e apaixonada pela criação",
+                description: "Este é o Círculo da simplicidade radical, do amor concreto e da entrega total. Aqui caminham os que preferem a paz ao poder, o servir ao brilhar, o essencial ao excesso. Uma galera que cuida do próximo, da natureza e da própria alma com leveza e coragem.",
+                reference: "🌾 Referência do Círculo:\nSão Francisco de Assis -- o pobrezinho de Cristo, irmão de todos, santo da paz e da ecologia. Um homem que escolheu viver o Evangelho no chão da vida, sem nada reter.",
+                symbols: "🕊️ Símbolos do Círculo Marrom:\nCordão franciscano, pomba branca, Tau (✝️).",
+                phrase: "📿 Frase que guia esse Círculo:\n\"É dando que se recebe.\"",
+                mascot: "Lobo",
+                founder: "São Francisco de Assis"
+            },
+            ravenclaw: {
+                name: "CÍRCULO ROXO",
+                image: "https://pfst.cf2.poecdn.net/base/image/01e002bd8551137a345dc9e82fe9a5c98352a5ef34190e3b8367cf41ece0f72e?w=1024&h=1024",
+                colors: "ravenclaw",
+                traits: "paz rara, força silenciosa e sede profunda por Deus",
+                description: "Este é o Círculo da espera ativa, da escuta interior e da presença de Deus no silêncio. Aqui, caminham aqueles que não gritam, mas oram; que não se impõem, mas confiam; que encontram força na penitência e na espiritualidade profunda.",
+                reference: "🕊️ Referência do Círculo:\nSanta Teresa d'Ávila -- Doutora da Igreja, mulher de oração, coragem e reforma. Um espírito contemplativo que moveu montanhas com o coração entregue.",
+                phrase: "🕯️ Frase que guia esse Círculo:\n\"Nada te perturbe, nada te espante… só Deus basta.\"",
+                mascot: "Águia",
+                founder: "Santa Teresa d'Ávila"
+            },
+            hufflepuff: {
+                name: "CÍRCULO BRANCO",
+                image: "https://pfst.cf2.poecdn.net/base/image/55885602e4909d84fcb5e731d5bd72d563a3eae7752ec3289b7cd8855606b530?w=1024&h=1024",
+                colors: "hufflepuff",
+                traits: "luz serena, fé firme e amor que transborda com autoridade e ternura",
+                description: "Este é o Círculo da pureza da fé, da força interior e do amor inabalável a Cristo e à juventude. Aqui estão os que caminham com coragem, defendem a vida, proclamam a verdade com doçura e não se envergonham do Evangelho. É a galera que carrega no olhar a esperança e nas mãos a missão.",
+                reference: "🎤 Referência do Círculo:\nSão João Paulo II -- o Papa que marcou gerações, apaixonado por Maria, criador da Jornada Mundial da Juventude, atleta da fé e gigante espiritual.",
+                symbols: "🕊️ Símbolos do Círculo Branco:\nCruz processional, terço, bandeira.",
+                phrase: "📢 Frase que guia esse Círculo:\n\"Não tenham medo! Abri, ou melhor, escancarai as portas a Cristo!\"",
+                mascot: "Pomba", 
+                founder: "São João Paulo II"
+            }
+        };
+
+        // Easter eggs - famous names
+        const easterEggs = {
+            'harry': 'gryffindor',
+            'harry potter': 'gryffindor',
+            'hermione': 'gryffindor',
+            'hermione granger': 'gryffindor',
+            'ron': 'gryffindor',
+            'ronald weasley': 'gryffindor',
+            'draco': 'slytherin',
+            'draco malfoy': 'slytherin',
+            'severus': 'slytherin',
+            'severus snape': 'slytherin',
+            'tom riddle': 'slytherin',
+            'voldemort': 'slytherin',
+            'luna': 'ravenclaw',
+            'luna lovegood': 'ravenclaw',
+            'cho chang': 'ravenclaw',
+            'cedric': 'hufflepuff',
+            'cedric diggory': 'hufflepuff',
+            'newt': 'hufflepuff',
+            'newt scamander': 'hufflepuff'
+        };
+
+        let currentUser = '';
+
+        // Initialize stars
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Initialize floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Start the sorting process
+        function startSorting() {
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('sortingScreen').classList.remove('hidden');
+            document.getElementById('nameInput').focus();
+        }
+
+        // Handle name input
+        function handleNameInput(event) {
+            const nameInput = document.getElementById('nameInput');
+            const sortButton = document.getElementById('sortButton');
+            
+            if (event.key === 'Enter') {
+                if (nameInput.value.trim()) {
+                    performSorting();
+                }
+                return;
+            }
+            
+            // Enable/disable sort button based on input
+            if (nameInput.value.trim()) {
+                sortButton.disabled = false;
+                sortButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                sortButton.disabled = true;
+                sortButton.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        // Perform the sorting
+        async function performSorting() {
+            const nameInput = document.getElementById('nameInput');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                showCustomAlert('Por favor, digite seu nome primeiro!');
+                return;
+            }
+
+            currentUser = name;
+            
+            // Hide input and button
+            nameInput.style.display = 'none';
+            document.getElementById('sortButton').style.display = 'none';
+            
+            // Start thinking animation
+            const hat = document.getElementById('sortingHat');
+            const thinkingText = document.getElementById('thinkingText');
+            
+            hat.classList.add('hat-thinking');
+            thinkingText.classList.remove('hidden');
+            
+            // Wait for thinking animation
+            await new Promise(resolve => setTimeout(resolve, 4000));
+            
+            // Determine house - always Círculo Laranja
+            let selectedHouse = 'gryffindor'; // Círculo Laranja
+            
+            // Show result
+            showResult(selectedHouse);
+        }
+
+        // Show the sorting result
+        function showResult(houseKey) {
+            const house = houses[houseKey];
+            
+            // Hide sorting screen
+            document.getElementById('sortingScreen').classList.add('hidden');
+            
+            // Show result screen
+            const resultScreen = document.getElementById('resultScreen');
+            resultScreen.classList.remove('hidden');
+            
+            // Update house information
+            const crestImage = document.getElementById('houseCrestImage');
+            crestImage.src = house.image;
+            crestImage.alt = `Escudo do ${house.name}`;
+            
+            document.getElementById('houseName').textContent = house.name;
+            document.getElementById('houseName').className = `font-magical text-3xl md:text-5xl mb-6 text-${house.colors === 'hufflepuff' ? 'yellow' : house.colors === 'gryffindor' ? 'red' : house.colors === 'slytherin' ? 'white' : 'blue'}-400`;
+            
+            // Personal message
+            const messages = [
+                `"${currentUser}, eu vejo ${house.traits} em você! Perfeito para ${house.name}!"`,
+                `"Ah, ${currentUser}! Sua alma ressoa com ${house.traits}. ${house.name} será sua casa!"`,
+                `"Sem dúvida alguma, ${currentUser}! Você possui ${house.traits}. ${house.name}!"`,
+                `"Interessante, muito interessante... ${currentUser}, vejo ${house.traits} em seu coração. ${house.name}!"`,
+                `"${currentUser}, desde o momento que você se sentou aqui, eu soube... ${house.traits} brilha em você como uma chama! ${house.name}!"`,
+                `"Ah, ${currentUser}, que mente fascinante você tem! Posso sentir ${house.traits} correndo em suas veias. Definitivamente ${house.name}!"`,
+                `"Hmm, ${currentUser}... sim, sim... vejo grandes coisas em seu futuro! Sua ${house.traits} o levará longe em ${house.name}!"`,
+                `"${currentUser}, raramente vejo uma combinação tão perfeita! Sua ${house.traits} é exatamente o que ${house.name} procura!"`,
+                `"Que escolha fácil, ${currentUser}! Sua ${house.traits} ecoa pelos corredores ancestrais de ${house.name}!"`,
+                `"${currentUser}, posso ver a ${house.traits} em cada fibra do seu ser! Você nasceu para ${house.name}!"`,
+                `"Mil anos de experiência me dizem, ${currentUser}, que sua ${house.traits} encontrou sua verdadeira casa em ${house.name}!"`,
+                `"${currentUser}, que aura poderosa! Sua ${house.traits} brilha como as estrelas... ${house.name} o aguarda!"`,
+                `"Extraordinário, ${currentUser}! Sinto a ${house.traits} pulsando em seu coração jovem. ${house.name} é seu destino!"`,
+                `"${currentUser}, seus ancestros sorririam ao ver sua ${house.traits} sendo honrada em ${house.name}!"`,
+                `"Ah, ${currentUser}, que prazer encontrar uma alma com tanta ${house.traits}! ${house.name} será sua família!"`,
+                `"${currentUser}, posso ver que você trilhará grandes caminhos! Sua ${house.traits} é a chave para a grandeza em ${house.name}!"`
+            ];
+            
+            document.getElementById('personalMessage').textContent = messages[Math.floor(Math.random() * messages.length)];
+            
+            document.getElementById('houseDescription').textContent = house.description;
+            
+            // Update new separated content boxes
+            if (house.reference) {
+                document.getElementById('houseReference').firstElementChild.textContent = house.reference;
+                document.getElementById('houseReference').style.display = 'block';
+            } else {
+                document.getElementById('houseReference').style.display = 'none';
+            }
+            
+            if (house.symbols) {
+                document.getElementById('houseSymbols').firstElementChild.textContent = house.symbols;
+                document.getElementById('houseSymbols').style.display = 'block';
+            } else {
+                document.getElementById('houseSymbols').style.display = 'none';
+            }
+            
+            if (house.phrase) {
+                document.getElementById('housePhrase').firstElementChild.textContent = house.phrase;
+                document.getElementById('housePhrase').style.display = 'block';
+            } else {
+                document.getElementById('housePhrase').style.display = 'none';
+            }
+            
+            // Configure WhatsApp button with correct link and colors
+            const whatsappButton = document.getElementById('whatsappButton');
+            let whatsappLink, buttonStyle;
+            
+            switch(houseKey) {
+                case 'gryffindor': // Círculo Laranja
+                    whatsappLink = 'https://chat.whatsapp.com/FngPwhGb9l1AaZJRQuL0nk?mode=ac_t';
+                    buttonStyle = 'background: linear-gradient(135deg, #ff6b35, #ff8c42); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);';
+                    backgroundColor = 'linear-gradient(135deg, #000000 0%, #ff6b35 50%, #ff6b35 100%)';
+                    break;
+                case 'slytherin': // Círculo Marrom
+                    whatsappLink = 'https://chat.whatsapp.com/EHjxg6Geg6bFedanp0gGBq';
+                    buttonStyle = 'background: linear-gradient(135deg, #8b4513, #a0522d); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);';
+                    backgroundColor = 'linear-gradient(135deg, #000000 0%, #8b4513 50%, #8b4513 100%)';
+                    break;
+                case 'ravenclaw': // Círculo Roxo
+                    whatsappLink = 'https://chat.whatsapp.com/B76mPWqcbBnAmaj3uBMd4Z?mode=ac_t';
+                    buttonStyle = 'background: linear-gradient(135deg, #7c3aed, #9333ea); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);';
+                    backgroundColor = 'linear-gradient(135deg, #000000 0%, #7c3aed 50%, #7c3aed 100%)';
+                    break;
+                case 'hufflepuff': // Círculo Branco
+                    whatsappLink = 'https://chat.whatsapp.com/LyIJgzVqO9mJZPzZNFyH94?mode=ac_t';
+                    buttonStyle = 'background: linear-gradient(135deg, #ffffff, #f8f9fa); color: #333333; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);';
+                    backgroundColor = 'linear-gradient(135deg, #000000 0%, #ffffff 50%, #ffffff 100%)';
+                    break;
+                default:
+                    whatsappLink = '#';
+                    buttonStyle = 'background: #333333; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);';
+                    backgroundColor = '#000000';
+            }
+            
+            whatsappButton.href = whatsappLink;
+            whatsappButton.style.cssText = buttonStyle;
+            document.body.style.background = backgroundColor;
+        }
+
+
+
+        // Custom alert function (since alert() is not supported)
+        function showCustomAlert(message) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+            modal.innerHTML = `
+                <div class="bg-gray-900 border border-yellow-500 rounded-lg p-6 max-w-md w-full mx-4 text-center">
+                    <div class="text-yellow-300 text-4xl mb-4">🧙‍♂️</div>
+                    <p class="text-white font-story text-lg mb-6">${message}</p>
+                    <button onclick="this.closest('.fixed').remove()" class="magical-button text-white font-magical px-6 py-3 rounded-full">
+                        ✨ Entendido ✨
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Initialize the magical environment
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            createParticles();
+            
+            // Add event listener for name input
+            document.getElementById('nameInput').addEventListener('input', function(e) {
+                handleNameInput(e);
+            });
+        });
+    </script>
+</body>
+</html>
